@@ -9,7 +9,7 @@ import { Container, Form, Input, SubmitButton, List, User, Avatar, Name, Bio, Pr
 
 export default class Main extends Component {
     static navigationOptions = {
-        title: 'Usuários'
+        title: 'Usuários Github'
     }
 
     state = {

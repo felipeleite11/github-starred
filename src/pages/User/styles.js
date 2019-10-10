@@ -40,6 +40,13 @@ export const Stars = styled.FlatList.attrs({
     showsVerticalScrollIndicator: false
 })`
     margin-top: 20px;
+    opacity: ${props => props.refreshing ? 0.5 : 1};
+    
+    /* PASSAR PARA STYLESHEET CONVENCIONAL */
+    /* transition: opacity 2s linear; */
+    /* transition-property: opacity;
+    transition-duration: 2s;
+    transition-timing-function: linear; */
 `
 
 export const Starred = styled.View`
