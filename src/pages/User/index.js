@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import { ActivityIndicator } from 'react-native'
-import { Sorter } from '../../utils/sorter' 
 
 import api from '../../services/api'
 
@@ -17,53 +16,52 @@ export default class User extends Component {
     stars: [],
     loading: true,     // Substitui a FlatList por um ActivityIndicator
     refreshing: false, // Reduz a opacidade da FlatList
-    page: 1
+    page: 1,
+    user: null
   }
 
-  async componentDidMount() {
+  componentDidMount() {
     const { navigation } = this.props
-    const { page } = this.state
-
-    this.setState({ 
-      loading: true
-    })
 
     const user = navigation.getParam('user')
-    
-    const response = await api.get(`/users/${user.login}/starred?per_page=${itemsPerPage}&page=${page}`)
 
-    const stars = Sorter.sort(response.data, 'name')
+    this.setState({ user }, () => {
+      this.refreshList()
+    })
+  }
+
+  refreshList = async () => {
+    this.setState({ 
+      loading: true,
+      page: 1
+    })
+
+    const { user } = this.state    
+
+    const response = await api.get(`/users/${user.login}/starred?per_page=${itemsPerPage}&page=${1}`)
+
+    console.tron.log(`Página ${1} - ${response.data.length} itens`)
 
     this.setState({ 
-      stars,
+      stars: response.data,
       loading: false
     })
   }
 
-  async componentDidUpdate(_, prevState) {
-    const { page, stars } = this.state
-    
-    if(prevState.page !== page) {
-      const { navigation } = this.props
-      const user = navigation.getParam('user')
+  loadMore = async () => {
+    const { page, stars, user } = this.state
 
-      this.setState({ 
-        refreshing: true 
-      })
+    this.setState({ refreshing: true })
 
-      const response = await api.get(`/users/${user.login}/starred?per_page=${itemsPerPage}&page=${page}`)
+    const response = await api.get(`/users/${user.login}/starred?per_page=${itemsPerPage}&page=${page + 1}`)
 
-      const ordered = Sorter.sort(response.data, 'name')
-
-      this.setState({ 
-        stars: [...stars, ...ordered],
-        refreshing: false
-      })
-    }
-  }
-
-  loadMore = () => {
-    this.setState({ page: this.state.page + 1 })
+    this.setState({ 
+      page: response.data.length ? page + 1 : page,
+      stars: [...stars, ...response.data],
+      refreshing: false
+    }, () => {
+      console.tron.log(`Página ${this.state.page} - ${stars.length + response.data.length} itens`)
+    })
   }
 
   render() {
@@ -100,8 +98,8 @@ export default class User extends Component {
               )}
               onEndReachedThreshold={0.2}
               onEndReached={this.loadMore}
-              //ref={i => this.starListRef = i}
               refreshing={refreshing}
+              onRefresh={this.refreshList}
             />
           )
         }
