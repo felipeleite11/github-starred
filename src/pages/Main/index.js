@@ -5,7 +5,20 @@ import Icon from 'react-native-vector-icons/MaterialIcons'
 
 import api from '../../services/api'
 
-import { Container, Form, Input, SubmitButton, List, User, Avatar, Name, Bio, ProfileButton, ProfileButtonText } from './styles'
+import { 
+    Container, 
+    Form, 
+    Input, 
+    SubmitButton, 
+    List,
+    User,
+    Avatar,
+    Name,
+    Bio,
+    ProfileButton,
+    ProfileButtonText,
+    DeleteButton,
+    DeleteButtonContainer } from './styles'
 
 export default class Main extends Component {
     static navigationOptions = {
@@ -44,9 +57,10 @@ export default class Main extends Component {
         try {
             const response = await api.get(`/users/${newUser}`)
 
-            const { name, login, bio, avatar_url: avatar } = response.data
+            const { id, name, login, bio, avatar_url: avatar } = response.data
 
             const user = {
+                id,
                 name, 
                 login, 
                 bio, 
@@ -70,6 +84,12 @@ export default class Main extends Component {
     handleNavigate = (user) => {
         const { navigation } = this.props
         navigation.navigate('User', { user })
+    }
+
+    handleDelete = (user) => {
+        const { users } = this.state
+        this.setState({ users: users.filter(u => u.id !== user.id) })
+        Alert.alert(`Usuário ${user.name} foi excluído!`)
     }
 
     render() {
@@ -100,16 +120,24 @@ export default class Main extends Component {
                     data={users}
                     keyExtractor={user => user.login}
                     renderItem={({ item }) => (
-                        <User>
-                            <Avatar source={{ uri: item.avatar }} />
-                            <Name>{item.name}</Name>
-                            <Bio>{item.bio}</Bio>
-                            <ProfileButton onPress={() => this.handleNavigate(item)}>
-                                <ProfileButtonText>
-                                    Ver perfil
-                                </ProfileButtonText>
-                            </ProfileButton>
-                        </User>
+                        <>
+                            <DeleteButtonContainer>
+                                <DeleteButton onPress={() => this.handleDelete(item)}>
+                                    <Icon name="delete" size={20} color="#ef5350" /> 
+                                </DeleteButton>
+                            </DeleteButtonContainer>
+
+                            <User>
+                                <Avatar source={{ uri: item.avatar }} />
+                                <Name>{item.name}</Name>
+                                <Bio>{item.bio}</Bio>
+                                <ProfileButton onPress={() => this.handleNavigate(item)}>
+                                    <ProfileButtonText>
+                                        Ver perfil
+                                    </ProfileButtonText>
+                                </ProfileButton>
+                            </User>
+                        </>
                     )}
                 />
             </Container>

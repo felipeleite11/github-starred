@@ -30,8 +30,9 @@ export const SubmitButton = styled(RectButton)`
     border-radius: 4px;
     margin-left: 10px;
     padding: 0 12px;
-    opacity: ${props => props.loading ? 0.7 : 1}
+    opacity: ${props => props.loading ? 0.7 : 1};
 `
+
 export const List = styled.FlatList.attrs({
     showVerticalScrollIndicator: false
 })`
@@ -83,4 +84,13 @@ export const ProfileButtonText = styled.Text`
     font-weight: bold;
     color: #fff;
     text-transform: uppercase;
+`
+
+export const DeleteButtonContainer = styled.View`
+    flex-direction: row-reverse;
+`
+
+export const DeleteButton = styled(RectButton)`
+    justify-content: center;
+    padding: 5px 10px;
 `
