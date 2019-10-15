@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { ActivityIndicator } from 'react-native'
+import { ActivityIndicator, TouchableWithoutFeedback, TouchableNativeFeedback } from 'react-native'
 
 import api from '../../services/api'
 
@@ -42,8 +42,16 @@ export default class User extends Component {
 
     console.tron.log(`Página ${1} - ${response.data.length} itens`)
 
+    const stars = response.data.map(star => ({ 
+      id: star.id, 
+      name: star.name, 
+      avatar_url: star.owner.avatar_url, 
+      login: star.owner.login,
+      html_url: star.html_url 
+    }))
+
     this.setState({ 
-      stars: response.data,
+      stars: stars,
       loading: false
     })
   }
@@ -62,6 +70,11 @@ export default class User extends Component {
     }, () => {
       console.tron.log(`Página ${this.state.page} - ${stars.length + response.data.length} itens`)
     })
+  }
+
+  handleNavigation = (repo) => {
+    const { navigation } = this.props
+    navigation.navigate('Repo', { repo })
   }
 
   render() {
@@ -88,13 +101,15 @@ export default class User extends Component {
               data={stars}
               keyExtractor={star => String(star.id)}
               renderItem={({ item }) => (
-                <Starred>
-                  <OwnerAvatar source={{ uri: item.owner.avatar_url }} />
-                  <Info>
-                    <Title>{item.name}</Title>
-                    <Author>{item.owner.login}</Author>
-                  </Info>
-                </Starred>
+                <TouchableNativeFeedback onPress={() => this.handleNavigation(item)}>
+                  <Starred>
+                    <OwnerAvatar source={{ uri: item.avatar_url }} />
+                    <Info>
+                      <Title>{item.name}</Title>
+                      <Author>{item.login}</Author>
+                    </Info>
+                  </Starred>
+                </TouchableNativeFeedback>
               )}
               onEndReachedThreshold={0.2}
               onEndReached={this.loadMore}

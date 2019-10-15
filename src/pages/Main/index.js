@@ -57,7 +57,13 @@ export default class Main extends Component {
         try {
             const response = await api.get(`/users/${newUser}`)
 
-            const { id, name, login, bio, avatar_url: avatar } = response.data
+            const { 
+                id,
+                name,
+                login,
+                bio,
+                avatar_url: avatar
+            } = response.data
 
             const user = {
                 id,
