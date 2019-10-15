@@ -63,9 +63,17 @@ export default class User extends Component {
 
     const response = await api.get(`/users/${user.login}/starred?per_page=${itemsPerPage}&page=${page + 1}`)
 
+    const newStars = response.data.map(star => ({ 
+      id: star.id, 
+      name: star.name, 
+      avatar_url: star.owner.avatar_url, 
+      login: star.owner.login,
+      html_url: star.html_url 
+    }))
+
     this.setState({ 
       page: response.data.length ? page + 1 : page,
-      stars: [...stars, ...response.data],
+      stars: [...stars, ...newStars],
       refreshing: false
     }, () => {
       console.tron.log(`Página ${this.state.page} - ${stars.length + response.data.length} itens`)
